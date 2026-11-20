@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anushka Gangal · Résumé</title>
+<meta name="description" content="Résumé of Anushka Gangal, backend and data engineer in New York.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light dark;
+  --bg:light-dark(#e7e4df,#171513);--ink:light-dark(#141210,#ece8e2);--mute:light-dark(#5d5750,#a39c93);
+  --rule:light-dark(#cbc6be,#3a3530);--brick:light-dark(#c8371e,#e8593f)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Schibsted Grotesk",system-ui,sans-serif}
+a{color:inherit;text-decoration:none}
+:focus-visible{outline:2px solid var(--brick);outline-offset:3px;border-radius:2px}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule)}
+nav .in{max-width:1240px;margin:0 auto;display:flex;gap:10px 22px;align-items:center;flex-wrap:wrap;padding:12px max(5vw,16px)}
+nav .back{font-weight:800;margin-right:auto}
+nav .back:hover{color:var(--brick)}
+.btn{display:inline-flex;align-items:center;min-height:36px;padding:0 16px;border:1.5px solid var(--ink);border-radius:999px;font-weight:600;font-size:15px}
+.btn:hover{background:var(--ink);color:var(--bg)}
+main{padding:24px 16px 48px;display:grid;gap:20px;justify-items:center}
+canvas{display:block;width:min(100%,880px);height:auto;background:#fff;border-radius:4px;box-shadow:0 18px 40px -24px rgba(0,0,0,.45)}
+.msg{color:var(--mute);padding:40px 0;text-align:center}
+.msg a{color:var(--brick);text-decoration:underline}
+</style>
+</head>
+<body>
+<nav><div class="in">
+  <a class="back" href="./">← Anushka Gangal</a>
+  <a class="btn" href="Anushka_Gangal_Resume.pdf" download>Download PDF</a>
+</div></nav>
+<main id="pages"><p class="msg" id="msg">Loading résumé…</p></main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+(async()=>{
+  const out=document.getElementById('pages'),msg=document.getElementById('msg');
+  const fail=()=>{msg.innerHTML='Couldn’t display the résumé here. <a href="Anushka_Gangal_Resume.pdf">Open the PDF</a> instead.'};
+  if(!window.pdfjsLib)return fail();
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  let pdf;
+  try{pdf=await pdfjsLib.getDocument('Anushka_Gangal_Resume.pdf').promise}catch(e){return fail()}
+  const canvases=[];
+  const draw=async()=>{
+    for(let n=1;n<=pdf.numPages;n++){
+      const page=await pdf.getPage(n);
+      const c=canvases[n-1]||(canvases[n-1]=out.appendChild(document.createElement('canvas')));
+      c.setAttribute('aria-label',`Résumé page ${n} of ${pdf.numPages}`);c.setAttribute('role','img');
+      const cssW=Math.min(out.clientWidth-32,880);
+      const base=page.getViewport({scale:1});
+      const vp=page.getViewport({scale:cssW/base.width*(window.devicePixelRatio||1)});
+      c.width=vp.width;c.height=vp.height;
+      await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+    }
+    msg.remove();
+  };
+  await draw();
+  let t;addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(draw,200)});
+})();
+</script>
+</body>
+</html>
