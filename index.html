@@ -89,7 +89,7 @@ nav .cta:hover{background:var(--brick);color:#fff}
 .row:last-child{border-bottom:0}
 .row .lbl{font-weight:600;font-size:15px;line-height:1.25;padding-right:10px}
 .row .lbl small{display:block;font-weight:400;color:var(--mute);font-size:13px}
-.track{position:relative;height:28px;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/7 - 1px),var(--rule) calc(100%/7 - 1px) calc(100%/7))}
+.track{position:relative;height:28px;background:repeating-linear-gradient(90deg,transparent 0 calc(100%/var(--yrs,7) - 1px),var(--rule) calc(100%/var(--yrs,7) - 1px) calc(100%/var(--yrs,7)))}
 .span{position:absolute;top:4px;bottom:4px;border-radius:5px;background:var(--ink)}
 .span.work{background:var(--brick)}
 .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13.5px;color:var(--mute);margin-top:12px}
@@ -267,7 +267,8 @@ footer{font-size:13.5px;opacity:.65;margin-top:36px}
 
 <script>
 {
-  const Y0=2019,Y1=2026;
+  const Y0=2019,Y1=2027;
+  document.getElementById('rows').style.setProperty('--yrs',Y1-Y0);
   const pos=(y,m)=>((y+(m-1)/12)-Y0)/(Y1-Y0)*100;
   const ticks=document.getElementById('ticks');
   ticks.innerHTML=Array.from({length:Y1-Y0+1},(_,i)=>`<span style="left:${i/(Y1-Y0)*100}%">${Y0+i}</span>`).join('');
@@ -278,7 +279,7 @@ footer{font-size:13.5px;opacity:.65;margin-top:36px}
     {l:'NYU Courant',s:'M.S. CS',k:'',a:[2024,9],b:[2026,5]}
   ];
   document.getElementById('rows').innerHTML=rows.map(r=>{
-    const L=pos(...r.a),W=Math.max(pos(...r.b)-L,1.6);
+    const L=pos(...r.a),W=Math.min(Math.max(pos(...r.b)-L,1.6),100-L);
     return `<div class="row"><div class="lbl">${r.l}<small>${r.s}</small></div><div class="track"><div class="span ${r.k}" style="left:${L}%;width:${W}%" title="${r.l}"></div></div></div>`}).join('');
 
   const proj=[
